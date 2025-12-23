@@ -5,3 +5,5 @@ config(:unsplash_proxy, UnsplashProxy.Server, port: Box.Config.get("PORT", defau
 config(:unsplash_proxy, UnsplashProxy.Handler,
   unsplash_api_key: Box.Config.get!("UNSPLASH_API_KEY")
 )
+
+config(:unsplash_proxy, UnsplashProxy.Cache, ttl: Box.Config.int("CACHE_TTL", default: "0"))

@@ -1,4 +1,5 @@
 defmodule UnsplashProxy.Handler do
+  alias UnsplashProxy.Cache
   require Logger
 
   def init(_), do: []
@@ -11,20 +12,42 @@ defmodule UnsplashProxy.Handler do
     path =
       case conn.path_info do
         [] -> ""
-        parts -> Path.join(conn.path_info)
+        parts -> Path.join(parts)
       end
 
     uri = %URI{@unsplash_host | path: path, query: conn.query_string}
 
-    with {:ok, response} <-
-           Req.request(method: method, url: uri, headers: headers(), raw: true) do
-      respond_from_response(conn, response)
+    with {:ok, response} <- request(method, uri) do
+      respond_from_response(conn, uri, response)
     end
   end
 
-  defp respond_from_response(conn, %Req.Response{} = response) do
+  defp request(method, uri) do
+    Cache.cached(cache_key(uri), [cache_match: &should_cache?/1], fn ->
+      Logger.info("[#{inspect(__MODULE__)}.Req] [#{method}] [#{uri.path}] [#{uri.query}]")
+
+      Req.request(method: method, url: uri, headers: headers(), raw: true)
+    end)
+  end
+
+  defp should_cache?({:ok, %Req.Response{status: status}}) do
+    status in 200..299
+  end
+
+  defp should_cache?(_) do
+    false
+  end
+
+  defp cache_key(%URI{path: path, query: query}) do
+    :sha256
+    |> :crypto.hash("#{path}?#{query}")
+    |> Base.encode16()
+    |> String.downcase()
+  end
+
+  defp respond_from_response(conn, %URI{} = uri, %Req.Response{} = response) do
     Logger.debug(
-      "[#{inspect(__MODULE__)}.Req] [#{response.status}] [#{inspect(response.headers)}]"
+      "[#{inspect(__MODULE__)}.Req] [#{response.status}] [#{uri.path}] [#{inspect(response.headers)}]"
     )
 
     response.headers

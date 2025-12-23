@@ -4,6 +4,7 @@ defmodule UnsplashProxy.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      {Box.Cache.Server, name: UnsplashProxy.Cache},
       UnsplashProxy.Server
     ]
 

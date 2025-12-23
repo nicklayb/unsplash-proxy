@@ -10,7 +10,7 @@ docker-build:
   docker build -t {{image_tag}} -f ./dockerfiles/Dockerfile .
 
 docker-run: docker-build
-  docker run -p $PORT:$PORT -e PORT=$PORT -e UNSPLASH_API_KEY=$UNSPLASH_API_KEY unsplash_proxy:latest
+  docker run -p $PORT:$PORT -e PORT=$PORT -e UNSPLASH_API_KEY=$UNSPLASH_API_KEY -e CACHE_TTL=${CACHE_TTL} {{image_tag}}
 
 docker-tag:
   docker tag {{image_tag}} {{remote_tag}}
