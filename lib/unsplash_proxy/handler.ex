@@ -26,7 +26,7 @@ defmodule UnsplashProxy.Handler do
     Cache.cached(cache_key(uri), [cache_match: &should_cache?/1], fn ->
       Logger.info("[#{inspect(__MODULE__)}.Req] [#{method}] [#{uri.path}] [#{uri.query}]")
 
-      Req.request(method: method, url: uri, headers: headers(), raw: true)
+      Req.request(method: method, url: uri, headers: headers(), decode_body: false)
     end)
   end
 
