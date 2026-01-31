@@ -1,3 +1,5 @@
+> DEPRECATED: I'm not gonna be maintaining this repository. See my replacement (and generic) proxy project called [Proxy Cat](https://github.com/nicklayb/proxy_cat) (I promise, it's way better).
+
 # Unsplash Proxy
 
 Hosts a proxy that forwards request to Unsplash inferring your API key. 
